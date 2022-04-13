@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout = "http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/main.html"
+>
+<body onload="loadComments()">
+    <div layout:fragment="mainContent">
+        <div class="row mt-5" th:if="${success} != null">
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    Succesfully accepted order
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+        <div class = "row mt-5" sec:authorize="isAuthenticated()">
+            <div class="col-sm-6 mx-auto">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#additemtobasket">ADD ITEM</button>
+            </div>
+        </div>
+        <div class="modal fade" id="additemtobasket" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" sec:authorize="isAuthenticated()">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form action="/payment" method="post">
+                        <input type="hidden" th:value="${item.id}" name = "item_id">
+                    <div class="modal-header">
+                        <div class="icons">
+                        <i class="fab fa-cc-paypal fa-3x"></i>
+                        <i class="fas fa-money-check-alt fa-3x"></i>
+                        <i class="fab fa-cc-mastercard fa-3x"></i>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mt-3">
+                            <label >Amount of item</label>
+                            <input type="number" min="0" max="10000000" name="amount" class="form-control mt-2">
+                        </div>
+                        <div class="mt-3">
+                            <label for="">Card Number</label>
+                            <input type="text" class = "form-control mt-2" name="cardnumber">
+                        </div>
+                        <div class="mt-3">
+                               <div class="mt-2">
+                                   <table>
+                                       <tr>
+                                           <td>Expiration (MM/YY)</td>
+                                           <td class="ml-3">CVV</td>
+                                       </tr>
+                                       <tr>
+                                           <td>
+                                               <input type="text" name="expiration" class="form-control mt-2">
+                                           </td>
+                                           <td class="ml-5">
+                                               <input type="text" class="form-control ml-3 mt-2" name="cvv">
+                                           </td>
+                                       </tr>
+                                   </table>
+                               </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success">Pay</button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+
+
+        </div>
+
+
+        <div class="row mt-5">
+            <div class="col-sm-6 mx-auto">
+        <div class="card" style="width: 30rem;" th:if = "${item} != null">
+            <img th:src="@{'/viewava/' + ${item.images}}" height="350" width="500" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h5 class="card-title" th:text="Category + ' ' +  ${item.name}" style="color: #0d6efd;"></h5>
+                <p class="card-text" th:text=" Price + ' ' +  ${item.price}" > $</p>
+            </div>
+            <ul class="list-group list-group-flush">
+                <h4>
+                    <li class="list-group-item" th:text=" Amount + ' ' + ${item.amount}"> LEFT</li>
+                </h4>
+                <li class="list-group-item" th:text="Country + ' ' + ${item.country.name}"></li>
+            </ul>
+        </div>
+        </div>
+        </div>
+
+
+        <input type="hidden" th:value="${item.id}" id="itemId">
+            <div class="row mt-5" sec:authorize="isAuthenticated()">
+                <input type="hidden"  th:value="${currentUser.id}" id="userId">
+                <div class="mt-3">
+            <textarea name="" id="comment" class="form-control">
+            </textarea>
+            </div>
+            <div class="mt-3">
+                <button class="btn btn-primary btn-sm" onclick="addComment()">ADD COMMENT</button>
+            </div>
+        </div>
+        <div class="row mt-5" id="commentList">
+        </div>
+        <div class="row mt-5" sec:authorize="isAnonymous()">
+            <a href="/signin">
+                <h3 class="text-center">FOR LEAVE A COMMENT PLEASE TO AUTHORIZE</h3>
+            </a>
+        </div>
+        <script type="text/javascript">
+            function loadComments() {
+                var userId = document.getElementById('userId');
+                if(userId == null) {
+                    userId = -1;
+                }
+                var htmlContent = "";
+                var itemId = document.getElementById('itemId');
+                $.get("http://localhost:8000/api/allcomments/", {
+                itemId: itemId.value
+                },
+             function (data) {
+                for (let i = 0; i < data.length; i++) {
+                    btn = "";
+                    editbtn = "";
+                    if(data[i].user.id == userId.value) {
+                        btn = "<button class='btn btn-danger btn-sm'  onclick='deleteCommentTrigger(" + data[i].id + ")'> <i class = 'fas fa-shopping-basket'></i> </button>";
+                        editbtn = "<button class='btn btn-secondary btn-sm ml-2' onclick='editCommentTrigger(" + data[i].id + ")'> <i class='fas fa-edit'></i> </button>";
+                    }
+                    htmlContent += "<div class='list-group'>";
+                    htmlContent += "<a href='#' class='list-group-item list-group-item-action'>";
+                    htmlContent += "<div class='d-flex w-100 justify-content-between'>";
+                    htmlContent += "<img width = '80' src = '/viewava/" + data[i].user.avatar + "'>";
+                    htmlContent += "<h5 class='mb-1 pt-5'>" + data[i].name + "</h5>";
+                    htmlContent += "  <small class='text-muted pt-5'>" + data[i].postDate + btn + editbtn +  "</small>"
+                    htmlContent += "</div>";
+                    htmlContent += " <p class='mb-1'></p>"
+                    htmlContent += "<small class='text-muted'>"  + data[i].user.fullName +" </small>";
+                    htmlContent += " </a>";
+                    htmlContent += "</div>";
+                }
+                document.getElementById('commentList').innerHTML = htmlContent;
+                })
+            }
+
+            function addComment() {
+                    var itemId = document.getElementById('itemId');
+                    var comment = document.getElementById('comment');
+                    $.post("http://localhost:8000/api/addcomment", {
+                        comment: comment.value,
+                        itemId: itemId.value
+                    }, function (data)  {
+                        loadComments();
+                        comment.value = "";
+                    })
+            }
+        </script>
+        <input type="hidden" id="inputId">
+        <button id="deletebtn" data-bs-toggle='modal' data-bs-target='#deleteComment'></button>
+        <button id="editbtn" data-bs-toggle='modal' data-bs-target='#editComment'></button>
+        <div class="modal fade" id="deleteComment" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Delete Comment</h5>
+                        <button type="button" id="close" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure that delete this comment?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">No</button>
+                        <button class="btn btn-danger" id="formact"  onclick = "deleteComment()">YES</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            function deleteCommentTrigger(id) {
+                document.getElementById('inputId').value = id;
+                document.getElementById('deletebtn').click();
+            }
+            function editCommentTrigger(id) {
+                document.getElementById('inputId').value = id;
+                $.get("http://localhost:8000/api/getComment", {
+                    commentId: id
+                }, function (data) {
+                    document.getElementById('commentText').value = data.name;
+                })
+                document.getElementById('editbtn').click();
+            }
+            function deleteComment() {
+                document.getElementById('close').click();
+                var commentId = document.getElementById('inputId');
+                $.post("http://localhost:8000/api/deletecomment", {
+                    commentId: commentId.value
+                }, function (data) {
+                    loadComments();
+                })
+            }
+            function editComment() {
+                    document.getElementById('closeedit').click();
+                    var commentId = document.getElementById('inputId');
+                    var commentText = document.getElementById('commentText');
+                    $.post("http://localhost:8000/api/editcomment", {
+                        commentId: commentId.value,
+                        commentText:commentText.value
+                    }, function (data) {
+                        loadComments();
+                    })
+            }
+        </script>
+        <div class="modal fade" id="editComment" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="qwe" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="qwe">Edit Comment</h5>
+                        <button type="button" class="btn-close" id="closeedit" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" id="commentText" class="form-control" name="comment">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                        <button type = "submit" class="btn btn-success" onclick="editComment()">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

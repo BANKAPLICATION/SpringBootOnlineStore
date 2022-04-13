@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout = "http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/main.html"
+>
+<body>
+    <div layout:fragment="mainContent">
+            <ul class="nav justify-content-center">
+            </ul>
+       <div class="row">
+           <div class="col-sm-4" th:each="it: ${items}" style="margin-right: 30px;">
+           <div class="card" style="width: 18rem;" th:if="${it.images}!=null">
+               <img th:src="@{'/viewava/' + ${it.images}}" height="300" class="card-img-top" alt="...">
+               <div class="card-body">
+                   <h5 class="card-title" th:text="${it.name}"></h5>
+                   <p class="card-text" th:text="${it.country.name} + ' / ' + ${it.country.code}"></p>
+                   <a class="btn btn-primary" th:href="@{'/details/' + ${it.id}}">DETAILS</a>
+               </div>
+           </div>
+       </div>
+       </div>
+        </div>
+</body>
+</html>

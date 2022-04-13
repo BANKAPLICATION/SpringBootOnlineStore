@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout = "http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/main.html"
+>
+<body>
+<div layout:fragment="mainContent">
+    <div class="row mt-5">
+        <div class="col-sm-8 mx-auto" th:if="${orders}!=null">
+            <table class="table table-striped" cellpadding="20">
+                <thead>
+                    <tr>
+                            <th>Name Of Item</th>
+                            <th>Amount</th>
+                            <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="od: ${orders}">
+                        <td th:text="${od.items.name}">
+                        <td th:text="${od.amount}">
+                        <td th:text="${od.amount} * ${od.items.price}">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

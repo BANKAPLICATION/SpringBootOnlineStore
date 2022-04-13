@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout = "http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/main.html"
+>
+<body>
+<div layout:fragment="mainContent">
+    <div class="row mt-5">
+        <div class="col-6 mx-auto">
+            <h1 class="text-center">
+               ADD ITEM
+            </h1>
+                    <form th:action="@{'/additem'}" method = "post" enctype="multipart/form-data">
+                        <div class="mt-3">
+                            <label  class="form-label">NAME OF ITEM</label>
+                            <input class="form-control" type="text"  name="name">
+                        </div>
+                        <div class="mt-3">
+                            <label  class="form-label">AMOUNT OF ITEM</label>
+                            <input class="form-control" type="number"  name="amount">
+                        </div>
+                        <div class="mt-3">
+                            <label  class="form-label">PRICE OF ITEM</label>
+                            <input class="form-control" type="number"  name="price">
+                        </div>
+                        <div class="mt-3">
+                            <label  class="form-label">CATEGORIES OF ITEM</label>
+                            <select name="category_id"  class="form-control">
+                                <option th:each="cat: ${categories}"    th:value="${cat.id}"  th:text="${cat.name}"></option>
+                            </select>
+                        </div>
+
+                        <div class="mt-3">
+                            <label  class="form-label">COUNTRY OF ITEM</label>
+                            <select name="country_id"  class="form-control">
+                                <option th:each="cnt: ${countries}"    th:value="${cnt.id}"  th:text="${cnt.name} + ' / ' + ${cnt.code}  "></option>
+                            </select>
+                        </div>
+                        <div class="mt-3">
+                            <label  class="form-label">Choose your file</label>
+                            <input class="form-control" type="file"  name="avapic">
+                        </div>
+                            <div class="mt-2">
+                                <button class="btn btn-primary btn-sm">ADD ITEM</button>
+                            </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-6 mx-auto">
+            <form th:action="@{'/changePassword'}" method="post">
+                <div class="mt-3">
+                    <label for="">OLD PASSWORD</label>
+                    <input type="text" placeholder="OLD PASSWORD" class="form-control" name="old_password">
+                </div>
+                <div class="mt-3">
+                    <label for="">NEW PASSWORD</label>
+                    <input type="text" placeholder="NEW PASSWORD" class="form-control" name="new_password">
+                </div>
+                <div class="mt-3">
+                    <label for="">RE NEW PASSWORD</label>
+                    <input type="text" placeholder="RE NEW PASSWORD" class="form-control" name="re_new_password">
+                </div>
+                <div class="mt-3">
+                    <button class="btn btn-success btn-sm">CHANGE PASSWORD</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

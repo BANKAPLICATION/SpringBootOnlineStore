@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout = "http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/main.html"
+>
+<body>
+<div layout:fragment="mainContent">
+    <div class="row mt-5">
+        <div class="col-sm-6 mx-auto">
+            <form action="/toregister" method="post">
+                <div class="mt-3">
+                    <label for="" th:text="#{label.email}"></label>
+                    <input type="text" name="email" class="form-control mt-3">
+                </div>
+                <div class="mt-3">
+                    <label for="" th:text="#{label.fullname}"></label>
+                    <input type="text" name="fullname" class="form-control mt-3">
+                </div>
+
+                <div class="mt-3">
+                    <label for="" th:text="#{label.password}"></label>
+                    <input type="text" name="password" class="form-control mt-3">
+                </div>
+
+                <div class="mt-3">
+                    <label for="" th:text="#{label.repassword}"></label>
+                    <input type="text" name="repassword" class="form-control mt-3">
+                </div>
+                <div class="mt-3">
+                    <button class="btn btn-primary btn-sm" th:text="#{button.register}"></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
